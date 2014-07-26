@@ -22,6 +22,22 @@ class RefinersTestClass < RefinerMockActiveRecordBase
   end
 end
 
+module ActiveRecordExtenionTest
+  extend ActiveSupport::Concern
+  include do
+    class << self
+      def extended_with_test_extension; end
+      alias_method_chain :extended, :test_extension
+    end
+  end
+end
+
+class RefinersTestExtendedClass < Daylight::API
+  include ActiveRecordExtenionTest
+  self.password = nil
+  scopes :foo, :bar
+end
+
 describe Daylight::Refiners::AttributeSeive do
   let(:valid_attribute_names) { %w[foo bar baz] }
 
@@ -173,6 +189,11 @@ describe Daylight::Refiners do
     it "returns the remoted call data" do
       RefinersTestClass.remoted(id:1, remoted:'foo').should == 123
     end
+  end
+
+  it 'still has refinements when using other extensions that use alias_method_chain' do
+    RefinersTestClass.should respond_to(:refine_by)
+    RefinersTestExtendedClass.should respond_to(:refine_by)
   end
 end
 
