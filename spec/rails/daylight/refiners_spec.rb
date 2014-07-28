@@ -24,7 +24,7 @@ end
 
 module ActiveRecordExtenionTest
   extend ActiveSupport::Concern
-  include do
+  included do
     class << self
       def extended_with_test_extension; end
       alias_method_chain :extended, :test_extension
